@@ -135,18 +135,18 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-        while (1) {
-            clock_t = clock % NUM_FRAMES;
-            if (!frame_table[clock_t].protected) {
-                if (frame_table[clock_t].referenced) {
-                    frame_table[clock_t].referenced = 0;
-                } else {
-                    clock_t++;
-                    return clock_t - 1;
-                }
-            }
-            clock_t++;
-        }
+        // while (1) {
+        //     clock = clock % NUM_FRAMES;
+        //     if (!frame_table[clock].protected) {
+        //         if (frame_table[clock].referenced) {
+        //             frame_table[clock].referenced = 0;
+        //         } else {
+        //             clock++;
+        //             return clock - 1;
+        //         }
+        //     }
+        //     clock++;
+        // }
     }
 
     /* If every frame is protected, give up. This should never happen
