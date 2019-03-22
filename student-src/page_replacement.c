@@ -40,7 +40,19 @@ pfn_t free_frame(void) {
      *
      */
     if (frame_table[victim_pfn].mapped) {
+        fte_t *frameTableEntry = (fte_t*) (frame_table + victim_pfn);  //get the frame of the victim from frame table
+        pte_t *pageTable = (pte_t *)(mem +  frameTableEntry->process->saved_ptbr * PAGE_SIZE); //get the page table of victim process
+        pte_t *pageTableEntry = (pte_t *)(pageTable + frame_table[victim_pfn].vpn); //the page of the victim prcoess from page table
 
+        if (pageTableEntry-> dirty) {    //if the page is dirty
+            
+            stats.writebacks++;        //increment write backs because we are writing to disk (I/O queue)
+            swap_write(pageTableEntry, (mem + victim_pfn * PAGE_SIZE));
+            pageTableEntry-> dirty = 0;    //page is not dirty anymore
+        }
+        
+        pageTableEntry->valid = 0; //not in the frame anymore
+        frame_table[victim_pfn].mapped = 0; //not in use
     }
 
 
@@ -93,9 +105,21 @@ pfn_t select_victim_frame() {
         /* Implement a FIFO algorithm here */
 
 
+
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-
+        // while (1) {
+        //     clock = clock % NUM_FRAMES;
+        //     if (!frame_table[clock].protected) {
+        //         if (frame_table[clock].referenced) {
+        //             frame_table[clock].referenced = 0;
+        //         } else {
+        //             clock++;
+        //             return clock - 1;
+        //         }
+        //     }
+        //     clock++;
+        // }
     }
 
     /* If every frame is protected, give up. This should never happen
