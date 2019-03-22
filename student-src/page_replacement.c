@@ -131,7 +131,6 @@ pfn_t select_victim_frame() {
         if (head > 0) {
             return head;
         }
-    }
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
