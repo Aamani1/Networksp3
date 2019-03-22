@@ -103,6 +103,23 @@ pfn_t select_victim_frame() {
         }
     } else if (replacement == FIFO) {
         /* Implement a FIFO algorithm here */
+        timestamp_t longest = get_current_timestamp();
+        pfn_t best_frame = 0;
+        timestamp_t best_time = frame_table[0].timestamp;
+
+        pfn_t last_unprotected = NUM_FRAMES;
+        for (pfn_t i = 0; i < num_entries; i++) {
+            if (!frame_table[i].protected && frame_table[i].timestamp < best_time) {
+                best_frame = i;
+                best_time = frame_table[i].timestamp;
+            }
+                
+        }
+        /* If no victim found yet take the last unprotected frame
+           seen */
+        if (best_frame < NUM_FRAMES) {
+            return best_frame;
+        }
 
 
 
