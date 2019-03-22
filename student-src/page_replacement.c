@@ -119,7 +119,19 @@ pfn_t select_victim_frame() {
         //    seen */
         // if (best_frame < NUM_FRAMES) {
         //     return best_frame;
-        }
+        // }
+        timestamp_t longest = get_current_timestamp();
+        pfn_t head = 0;
+        for (pfn_t i = 0; i < NUM_FRAMES; i++) {
+            if ((frame_table[i].timestamp < longest) && !frame_table[i].protected) {
+                longest = frame_table[i].timestamp;
+            head = i;
+            }
+        }
+        if (head > 0) {
+            return head;
+        }
+    }
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
