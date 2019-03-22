@@ -107,7 +107,7 @@ pfn_t select_victim_frame() {
         pfn_t best_frame = 0;
         timestamp_t best_time = frame_table[0].timestamp;
 
-        // pfn_t last_unprotected = NUM_FRAMES;
+        //pfn_t last_unprotected = NUM_FRAMES;
         for (pfn_t i = 0; i < num_entries; i++) {
             if (!frame_table[i].protected && frame_table[i].timestamp < best_time) {
                 best_frame = i;
@@ -120,8 +120,6 @@ pfn_t select_victim_frame() {
         if (best_frame < NUM_FRAMES) {
             return best_frame;
         }
-
-
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
