@@ -124,13 +124,13 @@ pfn_t select_victim_frame() {
         pfn_t head = 0; 
 
         for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
-            if ((!frame_table[i].protected && frame_table[i].timestamp > longest)) { 
+            if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
                 longest = frame_table[i].timestamp; 
                 head = i; 
             } 
         } 
         if (head > 0) { 
-            return head; 
+            return head;  
         }
 
     } else if (replacement == CLOCKSWEEP) {
