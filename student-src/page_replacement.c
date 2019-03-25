@@ -120,18 +120,18 @@ pfn_t select_victim_frame() {
         // if (best_frame < NUM_FRAMES) {
         //     return best_frame;
         // }
-        timestamp_t longest = get_current_timestamp(); 
-        pfn_t head = 0; 
+        // timestamp_t longest = get_current_timestamp(); 
+        // pfn_t head = 0; 
 
-        for (pfn_t i = 0; i < num_entries; i++) { 
-            if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
-                longest = frame_table[i].timestamp; 
-                head = i; 
-            } 
-        } 
-        if (head > 0) { 
-            return head;  
-        }
+        // for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
+        //     if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
+        //         longest = frame_table[i].timestamp; 
+        //         head = i; 
+        //     } 
+        // } 
+        // if (head > 0) { 
+        //     return head;  
+        // }
         // timestamp_t longest = 0; 
         // pfn_t head = 0; 
 
@@ -144,6 +144,17 @@ pfn_t select_victim_frame() {
         // if (head > 0) { 
         //     return head;  
         // }
+        timestamp_t longest = get_current_timestamp();
+        pfn_t head = 0;
+        for (pfn_t i = 0; i < num_entries; i++) {
+            if (!frame_table[i].protected) {
+                if (frame_table[i].timestamp < longest) {
+                    head = i;
+                    longest = frame_table[i].timestamp;
+                }
+            }
+        }
+        return head;
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
