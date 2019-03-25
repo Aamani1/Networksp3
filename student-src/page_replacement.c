@@ -123,7 +123,7 @@ pfn_t select_victim_frame() {
         timestamp_t longest = get_current_timestamp(); 
         pfn_t head = 0; 
 
-        for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
+        for (pfn_t i = 0; i < num_entries; i++) { 
             if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
                 longest = frame_table[i].timestamp; 
                 head = i; 

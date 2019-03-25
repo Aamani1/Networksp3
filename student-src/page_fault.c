@@ -45,6 +45,7 @@ void page_fault(vaddr_t address) {
        a frame to use by calling free_frame(). */
     pfn_t freeFrameSlot = free_frame(); //free frame
     fte_t *frameTableEntry = (fte_t*) (frame_table + freeFrameSlot); //going to the free frame
+    
 
     /* Update the page table entry. Make sure you set any relevant values. */
 
