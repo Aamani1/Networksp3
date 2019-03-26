@@ -220,44 +220,28 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
 */
 void proc_cleanup(pcb_t *proc) {
     /* Look up the process's page table */
-    // pte_t *currentPageTable = (pte_t*)(mem + proc->saved_ptbr * PAGE_SIZE);   // get the page table of the current process
+    pte_t *currentPageTable = (pte_t*)(mem + proc->saved_ptbr * PAGE_SIZE);   // get the page table of the current process
 
-    // pte_t *pageTabaleEntry;
-    // fte_t *frameTableEntry;
+    pte_t *pageTabaleEntry;
+    fte_t *frameTableEntry;
     
-    // /* Iterate the page table and clean up each valid page */
-    // for (size_t i = 0; i < NUM_PAGES; i++) {
-    //     pageTabaleEntry = currentPageTable + i;    // accessing each page in the page table
-
-    //     if (pageTabaleEntry->valid) {
-
-    //         frameTableEntry = (fte_t*) (frame_table + pageTabaleEntry-> pfn); //getting the frame for each page
-    //         frameTableEntry -> mapped = 0;   // not in use (delete the link between page and frame.)
-    //     } 
-
-    //     if (pageTabaleEntry->swap) {
-    //         swap_free(pageTabaleEntry);   // swap if needed.
-    //     }
-    // }
-
-    // /* Free the page table itself in the frame table */
-    // (frame_table+ (proc -> saved_ptbr)) -> protected = 0; //can be reused
-    /* Look up the process's page table */
-    pte_t* pageTable = (pte_t*)(mem + ((proc->saved_ptbr) * PAGE_SIZE));
     /* Iterate the page table and clean up each valid page */
     for (size_t i = 0; i < NUM_PAGES; i++) {
-        pte_t* temp = pageTable + i;
-        if (temp->valid) {
-            fte_t* fte = frame_table + pageTable[i].pfn;
-            fte->mapped = 0;
-        }
-        if (temp->swap) {
-            swap_free(temp);
+        pageTabaleEntry = currentPageTable + i;    // accessing each page in the page table
+
+        if (pageTabaleEntry->valid) {
+
+            frameTableEntry = (fte_t*) (frame_table + pageTabaleEntry-> pfn); //getting the frame for each page
+            frameTableEntry -> mapped = 0;   // not in use (delete the link between page and frame.)
+        } 
+
+        if (pageTabaleEntry->swap) {
+            swap_free(pageTabaleEntry);   // swap if needed.
         }
     }
-    frame_table[proc->saved_ptbr].protected = 0;
-    frame_table[proc->saved_ptbr].mapped = 0;
-    frame_table[proc->saved_ptbr].referenced = 0;
+
+    /* Free the page table itself in the frame table */
+    (frame_table+ (proc -> saved_ptbr)) -> protected = 0; //can be reused
 }
 
 #pragma GCC diagnostic pop
