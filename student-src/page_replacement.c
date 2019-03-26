@@ -6,8 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-int clock;
-
+pfn_t ccs;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -57,7 +56,6 @@ pfn_t free_frame(void) {
         frame_table[victim_pfn].mapped = 0; //not in use
     }
 
-    frame_table[victim_pfn].referenced = 0;
     /* Return the pfn */
     return victim_pfn;
 }
@@ -120,16 +118,16 @@ pfn_t select_victim_frame() {
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
       while (1) { 
-        clock = clock % NUM_FRAMES; 
-        if (!frame_table[clock].protected) { 
-          if (frame_table[clock].referenced) { 
-            frame_table[clock].referenced = 0; 
+        ccs = ccs % NUM_FRAMES; 
+        if (!frame_table[ccs].protected) { 
+          if (frame_table[ccs].referenced) { 
+            frame_table[ccs].referenced = 0; 
           } else { 
-            clock++; 
-            return clock - 1; 
+            ccs++; 
+            return ccs - 1; 
           } 
         } 
-        clock++; 
+        ccs++; 
       }
     }
 
