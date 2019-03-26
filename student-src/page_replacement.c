@@ -6,7 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-pfn_t clock;
+int clock;
 
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------

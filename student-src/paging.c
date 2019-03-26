@@ -9,7 +9,6 @@
 
  /* The frame table pointer. You will set this up in system_init. */
 fte_t *frame_table;
-extern pfn_t clock;
 
 /*  --------------------------------- PROBLEM 2 --------------------------------------
     Checkout PDF section 4 for this problem
@@ -46,7 +45,6 @@ void system_init(void) {
      * frames in memory. The frame table will be useful later if we need to
      * evict pages during page faults.
      */
-    clock = 1;
     frame_table = (fte_t *)mem;
     memset(frame_table, 0, PAGE_SIZE);
 
@@ -250,7 +248,6 @@ void proc_cleanup(pcb_t *proc) {
     /* Free the page table itself in the frame table */
     fte_t* frame_entry = (fte_t*) (frame_table + proc->saved_ptbr);
     frame_entry->protected = 0;
-    frame_entry->referenced = 0;
 
 }
 
