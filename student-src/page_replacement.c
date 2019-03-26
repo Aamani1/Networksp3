@@ -117,65 +117,19 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-
-
-
-
-
-   /* FIX ME : Problem 5 */
-   /* IMPLEMENT A CLOCK SWEEP ALGORITHM HERE */
-   pte_t* page_table = (pte_t*) (mem + (PTBR * PAGE_SIZE));
-   // pte_t* pageEntry = (pte_t*) (page_table + vpn);
-
-   // for (pfn_t i = 0; i < NUM_FRAMES; i++) {
-   //      fte_t *entry = (fte_t *) (frame_table + i);
-   //      pcb_t *proc = entry->process;
-   //      // pte_t *page = proc->page_table[entry->vpn];
-   //      vpn_t vpn = vaddr_vpn(proc->saved_ptbr);
-   //      pte_t *page = page_table + vpn;
-   //      if (!page->valid) {
-   //          return i;
-   //      }
-   //  }
-
-    for (pfn_t i = 0; i < NUM_FRAMES; i++) {
-        fte_t *entry = (fte_t *) (frame_table + i);
-        pcb_t *proc = entry->process;
-        // pte_t *page = proc->page_table[entry->vpn];
-        vpn_t vpn = vaddr_vpn(proc->saved_ptbr);
-        pte_t *page = page_table + vpn;
-        if (!page->dirty) {
-            return i;
+      while(1) {
+          i_prime = i_prime % NUM_FRAMES;
+            if (frame_table[i_prime].protected != 1) {
+                if (frame_table[i_prime].referenced == 1) {
+                    frame_table[i_prime].referenced = 0;
+                } else {
+                    i_prime++;
+                    return i_prime-1;
+                }
+            }
+            i_prime++;
         }
-        page->dirty = 0;
     }
-
-
-    return 0;
-    }
-
-   //   for(pfn_t i = 0; i < NUM_FRAMES; i++) {
-
-   //  // if there is invalid entry
-   //      if(!page_table[i].valid) {
-
-   //          return page_table[i].pfn;
-   //      }
-   // }
-
-   // for(pfn_t i = 0; i < NUM_FRAMES; i++) {
-
-   //  // if there is not used=0 entry
-   //      if(!page_table[i].dirty) {
-
-   //          return page_table[i].pfn;
-   //      // if there is used=0 entry
-   //      }
-   //      page_table[i].dirty = 0;
-   // }
-// }
-
-
 
     /* If every frame is protected, give up. This should never happen
        on the traces we provide you. */
