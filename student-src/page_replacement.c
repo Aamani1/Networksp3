@@ -6,7 +6,6 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-// pfn_t ccs;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -117,18 +116,7 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-      // while (1) { 
-      //   ccs = ccs % NUM_FRAMES; 
-      //   if (!frame_table[ccs].protected) { 
-      //     if (frame_table[ccs].referenced) { 
-      //       frame_table[ccs].referenced = 0; 
-      //     } else { 
-      //       ccs++; 
-      //       return ccs - 1; 
-      //     } 
-      //   } 
-      //   ccs++; 
-      // }
+     
     }
 
     /* If every frame is protected, give up. This should never happen
