@@ -165,11 +165,11 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     uint16_t offset = vaddr_offset(address);    //getting the offset of the address.
     
     pte_t* pageTable = (pte_t*) (mem + (PTBR * PAGE_SIZE));    //getting the page table of the current process.
-    pte_t* page_entry = (pte_t*) (pageTable + vpn);    //getting the pfn from vpn through page table stored in frame
+    pte_t* pageEntry = (pte_t*) (pageTable + vpn);    //getting the pfn from vpn through page table stored in frame
                                                         // finding the frame associated with the pfn from the page
 
     /* If an entry is invalid, just page fault to allocate a page for the page table. */
-    if (!page_entry->valid) {
+    if (!pageEntry->valid) {
         stats.page_faults++;
         page_fault(address);
     }
@@ -204,7 +204,7 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     } else {
         stats.writes++;     //increment writing
         mem[physicaladdress] = data; 
-        page_entry->dirty = 1; //the disk needs to get the change of data that we write and so is dirty.
+        pageEntry->dirty = 1; //the disk needs to get the change of data that we write and so is dirty.
         return data;    /* Return the data read/written */
     }
 
@@ -231,15 +231,15 @@ void proc_cleanup(pcb_t *proc) {
     /* Iterate the page table and clean up each valid page */
 
     for (size_t i = 0; i < NUM_PAGES; i++) {
-        pte_t* page_entry = pageTable + i;
-        if (page_entry->valid) {
-            pfn_t pfn = page_entry->pfn;
-            page_entry->valid = 0;
+        pte_t* pageEntry = pageTable + i;
+        if (pageEntry->valid) {
+            pfn_t pfn = pageEntry->pfn;
+            pageEntry->valid = 0;
             fte_t* frame_entry = (fte_t*) (frame_table + pfn);
             frame_entry->mapped = 0;
         }
-        if (swap_exists(page_entry)) {
-            swap_free(page_entry);
+        if (swap_exists(pageEntry)) {
+            swap_free(pageEntry);
         }
     }
 
