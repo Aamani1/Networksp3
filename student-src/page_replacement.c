@@ -6,6 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
+int i_prime = 0;
 
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
