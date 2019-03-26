@@ -84,8 +84,8 @@ void proc_init(pcb_t *proc) {
      * this process's page table. You should zero-out the memory.
      */
 
-    pfn_t i = free_frame();
-    memset(mem + (i * PAGE_SIZE), 0, PAGE_SIZE);
+    pfn_t frameNum = free_frame();          //getting an empty frame and naming it as a frame number
+    memset(mem + (frameNum * PAGE_SIZE), 0, PAGE_SIZE); //going to that particular frame and clearing out values to 0
 
 
     /*
@@ -96,9 +96,9 @@ void proc_init(pcb_t *proc) {
      * want your page table to be accidentally evicted.
      */
 
-    fte_t* entry = (fte_t*) (frame_table + i);
-    entry->protected = 1;
-    proc->saved_ptbr = i;
+    fte_t* entry = (fte_t*) (frame_table + frameNum);
+    entry->protected = 1;   //setting the processes frame protected
+    proc->saved_ptbr = frameNum;
 
 
 }
@@ -119,6 +119,8 @@ void proc_init(pcb_t *proc) {
 void context_switch(pcb_t *proc) {
 
     PTBR =  proc -> saved_ptbr;
+    /* PTBR = page table base register. It tells where to look to find the page table for the currently 
+    running process. Now, we are setting PTBR to the curent proc page table. */
 
 }
 
@@ -155,13 +157,16 @@ void context_switch(pcb_t *proc) {
 uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
 
     stats.accesses++;
+    
     /* Split the address and find the page table entry.
        Remember to keep a pointer to the entry so you can modify it later. */
 
-    vpn_t vpn = vaddr_vpn(address);
-    uint16_t offset = vaddr_offset(address);
-    pte_t* page_table = (pte_t*) (mem + (PTBR * PAGE_SIZE));
-    pte_t* page_entry = (pte_t*) (page_table + vpn);
+    vpn_t vpn = vaddr_vpn(address);         //getting the vpn of the address.
+    uint16_t offset = vaddr_offset(address);    //getting the offset of the address.
+    
+    pte_t* pageTable = (pte_t*) (mem + (PTBR * PAGE_SIZE));    //getting the page table of the current process.
+    pte_t* page_entry = (pte_t*) (pageTable + vpn);    //getting the pfn from vpn through page table stored in frame
+                                                        // finding the frame associated with the pfn from the page
 
     /* If an entry is invalid, just page fault to allocate a page for the page table. */
     if (!page_entry->valid) {
@@ -187,20 +192,20 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     */
 
 
-    pfn_t pfn = page_table[vpn].pfn;
-    paddr_t physical_address = ((paddr_t) pfn << OFFSET_LEN) | offset;
+    pfn_t pfn = pageTable[vpn].pfn;
+    paddr_t physicaladdress = ((paddr_t) pfn << OFFSET_LEN) | offset;
 
     /* Either read or write the data to the physical address
        depending on 'rw' */
 
     if (rw == 'r') {
-        stats.reads++;
-        return mem[physical_address];
+        stats.reads++;      // increment reading
+        return mem[physicaladdress];
     } else {
-        stats.writes++;
-        mem[physical_address] = data;
-        page_entry->dirty = 1;
-        return data;
+        stats.writes++;     //increment writing
+        mem[physicaladdress] = data; 
+        page_entry->dirty = 1; //the disk needs to get the change of data that we write and so is dirty.
+        return data;    /* Return the data read/written */
     }
 
 }
@@ -222,11 +227,11 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
 void proc_cleanup(pcb_t *proc) {
     /* Look up the process's page table */
 
-    pte_t *page_table = (pte_t*) (mem + ((proc -> saved_ptbr) * PAGE_SIZE));
+    pte_t *pageTable = (pte_t*) (mem + ((proc -> saved_ptbr) * PAGE_SIZE));
     /* Iterate the page table and clean up each valid page */
 
     for (size_t i = 0; i < NUM_PAGES; i++) {
-        pte_t* page_entry = page_table + i;
+        pte_t* page_entry = pageTable + i;
         if (page_entry->valid) {
             pfn_t pfn = page_entry->pfn;
             page_entry->valid = 0;
