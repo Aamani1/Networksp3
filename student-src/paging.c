@@ -9,7 +9,7 @@
 
  /* The frame table pointer. You will set this up in system_init. */
 fte_t *frame_table;
-extern pfn_t ccs;
+
 /*  --------------------------------- PROBLEM 2 --------------------------------------
     Checkout PDF section 4 for this problem
 
@@ -45,7 +45,6 @@ void system_init(void) {
      * frames in memory. The frame table will be useful later if we need to
      * evict pages during page faults.
      */
-    ccs = 1
     frame_table = (fte_t *)mem;
     memset(frame_table, 0, PAGE_SIZE);
 
@@ -175,9 +174,6 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         page_fault(address);
     }
 
-    /* Set the "referenced" bit to reduce the page's likelihood of eviction */
-    frame_table[pageEntry->pfn].referenced = 1;
-
 
     /*
         The physical address will be constructed like this:
@@ -249,7 +245,7 @@ void proc_cleanup(pcb_t *proc) {
     /* Free the page table itself in the frame table */
     fte_t* frame_entry = (fte_t*) (frame_table + proc->saved_ptbr);
     frame_entry->protected = 0;
-     frame_entry->referenced = 0;
+
 }
 
 #pragma GCC diagnostic pop

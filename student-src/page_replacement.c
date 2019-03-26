@@ -6,7 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-pfn_t ccs;
+// pfn_t ccs;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -105,30 +105,30 @@ pfn_t select_victim_frame() {
         /* Implement a FIFO algorithm here */
         timestamp_t longest = get_current_timestamp();
         pfn_t head = 0;
-        for (pfn_t i = 0; i < num_entries; i++) {
-            if (!frame_table[i].protected) {
-                if (frame_table[i].timestamp < longest) {
+        for (pfn_t i = 0; i < num_entries; i++) { //iterate over the all the entries
+            if (!frame_table[i].protected) {    //if not protected
+                if (frame_table[i].timestamp < longest) {   //if less than longest
                     head = i;
-                    longest = frame_table[i].timestamp;
+                    longest = frame_table[i].timestamp; //update the time
                 }
             }
         }
-        return head;
+        return head;    
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-      while (1) { 
-        ccs = ccs % NUM_FRAMES; 
-        if (!frame_table[ccs].protected) { 
-          if (frame_table[ccs].referenced) { 
-            frame_table[ccs].referenced = 0; 
-          } else { 
-            ccs++; 
-            return ccs - 1; 
-          } 
-        } 
-        ccs++; 
-      }
+      // while (1) { 
+      //   ccs = ccs % NUM_FRAMES; 
+      //   if (!frame_table[ccs].protected) { 
+      //     if (frame_table[ccs].referenced) { 
+      //       frame_table[ccs].referenced = 0; 
+      //     } else { 
+      //       ccs++; 
+      //       return ccs - 1; 
+      //     } 
+      //   } 
+      //   ccs++; 
+      // }
     }
 
     /* If every frame is protected, give up. This should never happen
