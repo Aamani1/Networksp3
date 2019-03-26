@@ -9,6 +9,7 @@
 
  /* The frame table pointer. You will set this up in system_init. */
 fte_t *frame_table;
+extern pfn_t clock;
 
 /*  --------------------------------- PROBLEM 2 --------------------------------------
     Checkout PDF section 4 for this problem
