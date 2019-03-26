@@ -36,11 +36,12 @@ pfn_t free_frame(void) {
      * 1) Look up the corresponding page table entry
      * 2) If the entry is dirty, write it to disk with swap_write()
      * 3) Mark the original page table entry as invalid
-     * 4) Unmap the corresponding frame table entry
      *
      */
     if (frame_table[victim_pfn].mapped) {
+
         fte_t *frameTableEntry = (fte_t*) (frame_table + victim_pfn);  //get the frame of the victim from frame table
+
         pte_t *pageTable = (pte_t *)(mem +  frameTableEntry->process->saved_ptbr * PAGE_SIZE); //get the page table of victim process
         pte_t *pageTableEntry = (pte_t *)(pageTable + frame_table[victim_pfn].vpn); //the page of the victim prcoess from page table
 
@@ -54,7 +55,6 @@ pfn_t free_frame(void) {
         pageTableEntry->valid = 0; //not in the frame anymore
         frame_table[victim_pfn].mapped = 0; //not in use
     }
-
 
     /* Return the pfn */
     return victim_pfn;
