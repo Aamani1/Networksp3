@@ -10,7 +10,7 @@ pfn_t select_victim_frame(void);
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
-    
+
     Make a free frame for the system to use.
 
     You will first call the page replacement algorithm to identify an
@@ -22,6 +22,7 @@ pfn_t select_victim_frame(void);
     setting it to invalid. If the frame is dirty, write its data to swap!
  * ----------------------------------------------------------------------------------
  */
+
 pfn_t free_frame(void) {
     pfn_t victim_pfn;
 
@@ -39,22 +40,20 @@ pfn_t free_frame(void) {
      * 4) Unmap the corresponding frame table entry
      *
      */
+
     if (frame_table[victim_pfn].mapped) {
-        fte_t *frameTableEntry = (fte_t*) (frame_table + victim_pfn);  //get the frame of the victim from frame table
-        pte_t *pageTable = (pte_t *)(mem +  frameTableEntry->process->saved_ptbr * PAGE_SIZE); //get the page table of victim process
-        pte_t *pageTableEntry = (pte_t *)(pageTable + frame_table[victim_pfn].vpn); //the page of the victim prcoess from page table
+        fte_t* frame_entry = (fte_t*) (frame_table + victim_pfn);
+        pte_t* address = (pte_t*) (mem + frame_entry->process->saved_ptbr*PAGE_SIZE);
+        pte_t* page_entry = (pte_t*) (address + frame_table[victim_pfn].vpn);
 
-        if (pageTableEntry-> dirty) {    //if the page is dirty
-            
-            stats.writebacks++;        //increment write backs because we are writing to disk (I/O queue)
-            swap_write(pageTableEntry, (mem + victim_pfn * PAGE_SIZE));
-            pageTableEntry-> dirty = 0;    //page is not dirty anymore
+        if (page_entry->dirty) {
+            stats.writebacks += 1;
+            swap_write(page_entry, mem + ((victim_pfn) * PAGE_SIZE));
+            page_entry->dirty = 0;
         }
-        
-        pageTableEntry->valid = 0; //not in the frame anymore
-        frame_table[victim_pfn].mapped = 0; //not in use
+        page_entry->valid = 0;
+        frame_table[victim_pfn].mapped = 0;
     }
-
 
     /* Return the pfn */
     return victim_pfn;
@@ -63,7 +62,7 @@ pfn_t free_frame(void) {
 
 
 /*  --------------------------------- PROBLEM 9 --------------------------------------
-    Checkout PDF section 7, 9, and 11 for this problem
+    Checkout PDF section 7 and 9 for this problem
 
     Finds a free physical frame. If none are available, uses either a
     randomized or FIFO algorithm to find a used frame for
@@ -102,79 +101,80 @@ pfn_t select_victim_frame() {
             return last_unprotected;
         }
     } else if (replacement == FIFO) {
-
-        timestamp_t longest = get_current_timestamp(); 
-        pfn_t head = 0; 
-        for (pfn_t i = 0; i < num_entries; i++) { 
-            if (!frame_table[i].protected) { 
-                if (frame_table[i].timestamp < longest) {
-                 head = i; longest = frame_table[i].timestamp; 
-                } 
-            } 
-        } 
-        return head;
         /* Implement a FIFO algorithm here */
-        // timestamp_t longest = get_current_timestamp();
-        // pfn_t best_frame = 0;
-        // timestamp_t best_time = frame_table[0].timestamp;
-
-        // //pfn_t last_unprotected = NUM_FRAMES;
-        // for (pfn_t i = 0; i < num_entries; i++) {
-        //     if (!frame_table[i].protected && frame_table[i].timestamp < best_time) {
-        //         best_frame = i;
-        //         best_time = frame_table[i].timestamp;
-        //     }
-                
-        // }
-        // /* If no victim found yet take the last unprotected frame
-        //    seen */
-        // if (best_frame < NUM_FRAMES) {
-        //     return best_frame;
-        // }
-
-
-        // timestamp_t longest = get_current_timestamp(); 
-        // pfn_t head = 0; 
-
-        // for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
-        //     if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
-        //         longest = frame_table[i].timestamp; 
-        //         head = i; 
-        //     } 
-        // } 
-        // if (head > 0) { 
-        //     return head;  
-        // }
-
-
-        // timestamp_t longest = 0; 
-        // pfn_t head = 0; 
-
-        // for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
-        //     if (longest == 0 || (!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
-        //         longest = frame_table[i].timestamp; 
-        //         head = i; 
-        //     } 
-        // } 
-        // if (head > 0) { 
-        //     return head;  
-        // }
+        timestamp_t longest = get_current_timestamp();
+        pfn_t head = 0;
+        for (pfn_t i = 0; i < num_entries; i++) {
+            if (!frame_table[i].protected) {
+                if (frame_table[i].timestamp < longest) {
+                    head = i;
+                    longest = frame_table[i].timestamp;
+                }
+            }
+        }
+        return head;
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-        // while (1) {
-        //     clock = clock % NUM_FRAMES;
-        //     if (!frame_table[clock].protected) {
-        //         if (frame_table[clock].referenced) {
-        //             frame_table[clock].referenced = 0;
-        //         } else {
-        //             clock++;
-        //             return clock - 1;
-        //         }
-        //     }
-        //     clock++;
-        // }
+
+
+
+
+
+   /* FIX ME : Problem 5 */
+   /* IMPLEMENT A CLOCK SWEEP ALGORITHM HERE */
+   pte_t* page_table = (pte_t*) (mem + (PTBR * PAGE_SIZE));
+   // pte_t* page_entry = (pte_t*) (page_table + vpn);
+
+   // for (pfn_t i = 0; i < NUM_FRAMES; i++) {
+   //      fte_t *entry = (fte_t *) (frame_table + i);
+   //      pcb_t *proc = entry->process;
+   //      // pte_t *page = proc->page_table[entry->vpn];
+   //      vpn_t vpn = vaddr_vpn(proc->saved_ptbr);
+   //      pte_t *page = page_table + vpn;
+   //      if (!page->valid) {
+   //          return i;
+   //      }
+   //  }
+
+    for (pfn_t i = 0; i < NUM_FRAMES; i++) {
+        fte_t *entry = (fte_t *) (frame_table + i);
+        pcb_t *proc = entry->process;
+        // pte_t *page = proc->page_table[entry->vpn];
+        vpn_t vpn = vaddr_vpn(proc->saved_ptbr);
+        pte_t *page = page_table + vpn;
+        if (!page->dirty) {
+            return i;
+        }
+        page->dirty = 0;
     }
+
+
+    return 0;
+    }
+
+   //   for(pfn_t i = 0; i < NUM_FRAMES; i++) {
+
+   //  // if there is invalid entry
+   //      if(!page_table[i].valid) {
+
+   //          return page_table[i].pfn;
+   //      }
+   // }
+
+   // for(pfn_t i = 0; i < NUM_FRAMES; i++) {
+
+   //  // if there is not used=0 entry
+   //      if(!page_table[i].dirty) {
+
+   //          return page_table[i].pfn;
+   //      // if there is used=0 entry
+   //      }
+   //      page_table[i].dirty = 0;
+   // }
+// }
+
+
 
     /* If every frame is protected, give up. This should never happen
        on the traces we provide you. */
