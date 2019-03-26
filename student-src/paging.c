@@ -96,7 +96,7 @@ void proc_init(pcb_t *proc) {
 
     // proc -> saved_ptbr = frameNumber;               //for the current process saves the processes' page table to the frame number.
     // (frame_table + frameNumber) -> protected = 1;      //setting the processes frame protected
-    fte_t* entry = (fte_t*) (frame_table + i);
+    fte_t* entry = (fte_t*) (frame_table + frameNumber);
     entry->protected = 1;
     proc->saved_ptbr = frameNumber;
 }
@@ -167,7 +167,7 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         stats.page_faults++;
         page_fault(address);
     }
-    
+
     /*
         The physical address will be constructed like this:
         -------------------------------------
