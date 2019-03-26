@@ -174,6 +174,8 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         page_fault(address);
     }
 
+    /* Set the "referenced" bit to reduce the page's likelihood of eviction */
+    frame_table[pageEntry->pfn].referenced = 1;
 
 
     /*
@@ -246,6 +248,7 @@ void proc_cleanup(pcb_t *proc) {
     /* Free the page table itself in the frame table */
     fte_t* frame_entry = (fte_t*) (frame_table + proc->saved_ptbr);
     frame_entry->protected = 0;
+    frame_entry->referenced = 0;
 
 }
 
