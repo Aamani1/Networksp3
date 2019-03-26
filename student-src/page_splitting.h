@@ -23,12 +23,12 @@
 
 /* Get the virtual page number from a virtual address. */
 static inline vpn_t vaddr_vpn(vaddr_t addr) {
-    return addr / PAGE_SIZE;                   /* FIXME */
+    return addr / PAGE_SIZE;                  //addr divided by page size = number of pages /* FIXME */
 }
 
 /* Get the offset into the page from a virtual address. */
 static inline uint16_t vaddr_offset(vaddr_t addr) {
-    return addr % PAGE_SIZE;                   /* FIXME */
+    return addr % PAGE_SIZE;                   //addr modulus by page size gives the remainder of how many bytes in each page  /* FIXME */
 }
 
 #pragma GCC diagnostic pop

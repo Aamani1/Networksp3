@@ -47,6 +47,7 @@ pfn_t free_frame(void) {
         pte_t* pageEntry = (pte_t*) (address + frame_table[victim_pfn].vpn);
 
         if (pageEntry->dirty) {
+            
             stats.writebacks ++;  //increment write backs because we are writing to disk (I/O queue)
             swap_write(pageEntry, mem + ((victim_pfn) * PAGE_SIZE));
             pageEntry->dirty = 0; //page is not dirty anymore

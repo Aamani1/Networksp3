@@ -77,7 +77,7 @@ void page_fault(vaddr_t address) {
     if (swap_exists(pageEntry)) {   //if the page has swap set
         swap_read(pageEntry, frame_ptr); //load in data from memory
     } else {
-        memset(frame_ptr, 0, PAGE_SIZE);    //just zero the page's memory.
+        memset(frame_ptr, 0, PAGE_SIZE);    //just zero the pages memory.
     }
 
 

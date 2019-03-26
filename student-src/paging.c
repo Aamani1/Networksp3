@@ -230,15 +230,15 @@ void proc_cleanup(pcb_t *proc) {
     pte_t *pageTable = (pte_t*) (mem + ((proc -> saved_ptbr) * PAGE_SIZE));
     /* Iterate the page table and clean up each valid page */
 
-    for (size_t i = 0; i < NUM_PAGES; i++) {
+    for (size_t i = 0; i < NUM_PAGES; i++) {    // accessing each page in the page table
         pte_t* pageEntry = pageTable + i;
         if (pageEntry->valid) {
             pfn_t pfn = pageEntry->pfn;
             pageEntry->valid = 0;
             fte_t* frame_entry = (fte_t*) (frame_table + pfn);
-            frame_entry->mapped = 0;
+            frame_entry->mapped = 0;    // not in use (delete the link between page and frame.)
         }
-        if (swap_exists(pageEntry)) {
+        if (swap_exists(pageEntry)) {   //swap if need be
             swap_free(pageEntry);
         }
     }
