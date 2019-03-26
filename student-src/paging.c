@@ -56,7 +56,7 @@ void system_init(void) {
      * however, there are some frames we never want to evict.
      * We mark these special pages as "protected" to indicate this.
      */
-    // frame_table[0].protected = 1;
+    
     frame_table -> protected = 1;
 
 

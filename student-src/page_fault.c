@@ -51,16 +51,16 @@ void page_fault(vaddr_t address) {
     pageEntry->pfn = freeFrameSlot;
 
     /* Update the frame table. Make sure you set any relevant values. */
-    fte_t* frameTableEntry = (fte_t*) (frame_table + freeFrameSlot);
-    frameTableEntry->mapped = 1;
-    frameTableEntry->process = current_process;
-    frameTableEntry->vpn = vpn;
+    fte_t* frameEntry = (fte_t*) (frame_table + freeFrameSlot);
+    frameEntry->mapped = 1;
+    frameEntry->process = current_process;
+    frameEntry->vpn = vpn;
 
     /*
         Update the timestamp of the appropriate frame table entry with the provided
         get_current_timestamp function. Timestamps values are used by the FIFO algorithm.
     */
-    frameTableEntry->timestamp = get_current_timestamp();   //update time stamp
+    frameEntry->timestamp = get_current_timestamp();   //update time stamp
 
     /* Initialize the page's memory. On a page fault, it is not enough
      * just to allocate a new frame. We must load in the old data from

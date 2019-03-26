@@ -42,17 +42,17 @@ pfn_t free_frame(void) {
      */
 
     if (frame_table[victim_pfn].mapped) {
-        fte_t* frame_entry = (fte_t*) (frame_table + victim_pfn);
-        pte_t* address = (pte_t*) (mem + frame_entry->process->saved_ptbr*PAGE_SIZE);
-        pte_t* page_entry = (pte_t*) (address + frame_table[victim_pfn].vpn);
+        fte_t* frameEntry = (fte_t*) (frame_table + victim_pfn);
+        pte_t* address = (pte_t*) (mem + frameEntry->process->saved_ptbr*PAGE_SIZE);
+        pte_t* pageEntry = (pte_t*) (address + frame_table[victim_pfn].vpn);
 
-        if (page_entry->dirty) {
-            stats.writebacks += 1;
-            swap_write(page_entry, mem + ((victim_pfn) * PAGE_SIZE));
-            page_entry->dirty = 0;
+        if (pageEntry->dirty) {
+            stats.writebacks ++;  //increment write backs because we are writing to disk (I/O queue)
+            swap_write(pageEntry, mem + ((victim_pfn) * PAGE_SIZE));
+            pageEntry->dirty = 0; //page is not dirty anymore
         }
-        page_entry->valid = 0;
-        frame_table[victim_pfn].mapped = 0;
+        pageEntry->valid = 0; //not in the frame anymore
+        frame_table[victim_pfn].mapped = 0; //not in use
     }
 
     /* Return the pfn */
@@ -124,7 +124,7 @@ pfn_t select_victim_frame() {
    /* FIX ME : Problem 5 */
    /* IMPLEMENT A CLOCK SWEEP ALGORITHM HERE */
    pte_t* page_table = (pte_t*) (mem + (PTBR * PAGE_SIZE));
-   // pte_t* page_entry = (pte_t*) (page_table + vpn);
+   // pte_t* pageEntry = (pte_t*) (page_table + vpn);
 
    // for (pfn_t i = 0; i < NUM_FRAMES; i++) {
    //      fte_t *entry = (fte_t *) (frame_table + i);
