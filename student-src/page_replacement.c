@@ -6,11 +6,10 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
+int i_prime = 0;
 
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
-    Checkout PDF section 7 for this problem
-    
     Make a free frame for the system to use.
 
     You will first call the page replacement algorithm to identify an
@@ -31,30 +30,28 @@ pfn_t free_frame(void) {
     victim_pfn = select_victim_frame();
 
     /*
-     * If victim frame is currently mapped, we must evict it:
+     * If victim frame is currently mapped:
      *
      * 1) Look up the corresponding page table entry
      * 2) If the entry is dirty, write it to disk with swap_write()
      * 3) Mark the original page table entry as invalid
-     *
      */
-    if (frame_table[victim_pfn].mapped) {
-
-        fte_t *frameTableEntry = (fte_t*) (frame_table + victim_pfn);  //get the frame of the victim from frame table
-
-        pte_t *pageTable = (pte_t *)(mem +  frameTableEntry->process->saved_ptbr * PAGE_SIZE); //get the page table of victim process
-        pte_t *pageTableEntry = (pte_t *)(pageTable + frame_table[victim_pfn].vpn); //the page of the victim prcoess from page table
-
-        if (pageTableEntry-> dirty) {    //if the page is dirty
-            
-            stats.writebacks++;        //increment write backs because we are writing to disk (I/O queue)
-            swap_write(pageTableEntry, (mem + victim_pfn * PAGE_SIZE));
-            pageTableEntry-> dirty = 0;    //page is not dirty anymore
+    if (frame_table[victim_pfn].mapped == 1) {
+        vpn_t vpn = frame_table[victim_pfn].vpn;
+        pfn_t page = (*frame_table[victim_pfn].process).saved_ptbr;
+        pte_t* entry = (pte_t*) (mem + (page * PAGE_SIZE)) + vpn;
+        void* frame = (void*) (mem + (victim_pfn * PAGE_SIZE));
+        if ((*entry).dirty == 1) {
+            swap_write(entry, frame);
+            stats.writebacks += 1;
         }
-        
-        pageTableEntry->valid = 0; //not in the frame anymore
-        frame_table[victim_pfn].mapped = 0; //not in use
+        (*entry).dirty = 0;
+        (*entry).valid = 0;
+    } else {
+        frame_table[victim_pfn].mapped = 1;
     }
+
+    /* If the victim is in use, we must evict it first */
 
     /* Return the pfn */
     return victim_pfn;
@@ -63,11 +60,15 @@ pfn_t free_frame(void) {
 
 
 /*  --------------------------------- PROBLEM 9 --------------------------------------
-    Checkout PDF section 7, 9, and 11 for this problem
-
     Finds a free physical frame. If none are available, uses either a
-    randomized or FIFO algorithm to find a used frame for
+    randomized or clock sweep algorithm to find a used frame for
     eviction.
+
+    When implementing clock sweep, make sure you set the reference
+    bits to 0 for each frame that had its referenced bit set. Your
+    clock sweep should remember the index at which it leaves off and
+    resume at the same place for each run (you may need to add a
+    global or static variable for this).
 
     Return:
         The physical frame number of a free (or evictable) frame.
@@ -101,79 +102,20 @@ pfn_t select_victim_frame() {
         if (last_unprotected < NUM_FRAMES) {
             return last_unprotected;
         }
-    } else if (replacement == FIFO) {
-
-        timestamp_t longest = get_current_timestamp(); 
-        pfn_t head = 0; 
-        for (pfn_t i = 0; i < num_entries; i++) { 
-            if (!frame_table[i].protected) { 
-                if (frame_table[i].timestamp < longest) {
-                 head = i; longest = frame_table[i].timestamp; 
-                } 
-            } 
-        } 
-        return head;
-        /* Implement a FIFO algorithm here */
-        // timestamp_t longest = get_current_timestamp();
-        // pfn_t best_frame = 0;
-        // timestamp_t best_time = frame_table[0].timestamp;
-
-        // //pfn_t last_unprotected = NUM_FRAMES;
-        // for (pfn_t i = 0; i < num_entries; i++) {
-        //     if (!frame_table[i].protected && frame_table[i].timestamp < best_time) {
-        //         best_frame = i;
-        //         best_time = frame_table[i].timestamp;
-        //     }
-                
-        // }
-        // /* If no victim found yet take the last unprotected frame
-        //    seen */
-        // if (best_frame < NUM_FRAMES) {
-        //     return best_frame;
-        // }
-
-
-        // timestamp_t longest = get_current_timestamp(); 
-        // pfn_t head = 0; 
-
-        // for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
-        //     if ((!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
-        //         longest = frame_table[i].timestamp; 
-        //         head = i; 
-        //     } 
-        // } 
-        // if (head > 0) { 
-        //     return head;  
-        // }
-
-
-        // timestamp_t longest = 0; 
-        // pfn_t head = 0; 
-
-        // for (pfn_t i = 0; i < NUM_FRAMES; i++) { 
-        //     if (longest == 0 || (!frame_table[i].protected && frame_table[i].timestamp < longest)) { 
-        //         longest = frame_table[i].timestamp; 
-        //         head = i; 
-        //     } 
-        // } 
-        // if (head > 0) { 
-        //     return head;  
-        // }
-
     } else if (replacement == CLOCKSWEEP) {
-        /* Optionally, implement the clocksweep algorithm here */
-        // while (1) {
-        //     clock = clock % NUM_FRAMES;
-        //     if (!frame_table[clock].protected) {
-        //         if (frame_table[clock].referenced) {
-        //             frame_table[clock].referenced = 0;
-        //         } else {
-        //             clock++;
-        //             return clock - 1;
-        //         }
-        //     }
-        //     clock++;
-        // }
+        /* Implement a clock sweep algorithm here */
+        while(1) {
+          i_prime = i_prime % NUM_FRAMES;
+            if (frame_table[i_prime].protected != 1) {
+                if (frame_table[i_prime].referenced == 1) {
+                    frame_table[i_prime].referenced = 0;
+                } else {
+                    i_prime++;
+                    return i_prime-1;
+                }
+            }
+            i_prime++;
+        }
     }
 
     /* If every frame is protected, give up. This should never happen
