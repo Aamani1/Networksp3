@@ -151,7 +151,7 @@ void context_switch(pcb_t *proc) {
  */
 uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
 
-
+    stats.accesses++;
     /* Split the address and find the page table entry.
        Remember to keep a pointer to the entry so you can modify it later. */
     pte_t * PageTable = (pte_t *) (mem + (PTBR * PAGE_SIZE));       //getting the page table of the current process.
