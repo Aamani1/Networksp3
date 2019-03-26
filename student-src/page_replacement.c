@@ -43,22 +43,41 @@ pfn_t free_frame(void) {
      */
 
     if (frame_table[victim_pfn].mapped) {
-        fte_t* frameEntry = (fte_t*) (frame_table + victim_pfn);
-        pte_t* address = (pte_t*) (mem + frameEntry->process->saved_ptbr*PAGE_SIZE);
-        pte_t* pageEntry = (pte_t*) (address + frame_table[victim_pfn].vpn);
-
-        if (pageEntry->dirty) {
-            
-            stats.writebacks ++;  //increment write backs because we are writing to disk (I/O queue)
-            swap_write(pageEntry, mem + ((victim_pfn) * PAGE_SIZE));
-            pageEntry->dirty = 0; //page is not dirty anymore
-        }
-        pageEntry->valid = 0; //not in the frame anymore
-        frame_table[victim_pfn].mapped = 0; //not in use
+      vpn_t vpn = frame_table[victim_pfn].vpn;
+      pcb_t* pcb = frame_table[victim_pfn].process;
+      pte_t* pte = ((pte_t*)(mem + pcb->saved_ptbr * PAGE_SIZE)) + vpn;
+      
+      if (pageEntry->dirty) {
+        void* paddr = (void*)(mem + ((victim_pfn) * PAGE_SIZE));
+        swap_write(pageEntry, paddr);
+        pageEntry->dirty = 0;
+        stats.writebacks++;
+      }
+      pageEntry->valid = 0;
+      frame_table[victim_pfn].mapped = 0;
     }
-    frame_table[victim_pfn].referenced = 0;
+    frame_table[victim_pfn].referenced = 0; // inside or outside?
+    /* If the victim is in use, we must evict it first */
     /* Return the pfn */
     return victim_pfn;
+
+    // if (frame_table[victim_pfn].mapped) {
+    //     fte_t* frameEntry = (fte_t*) (frame_table + victim_pfn);
+    //     pte_t* address = (pte_t*) (mem + frameEntry->process->saved_ptbr*PAGE_SIZE);
+    //     pte_t* pageEntry = (pte_t*) (address + frame_table[victim_pfn].vpn);
+
+    //     if (pageEntry->dirty) {
+            
+    //         stats.writebacks ++;  //increment write backs because we are writing to disk (I/O queue)
+    //         swap_write(pageEntry, mem + ((victim_pfn) * PAGE_SIZE));
+    //         pageEntry->dirty = 0; //page is not dirty anymore
+    //     }
+    //     pageEntry->valid = 0; //not in the frame anymore
+    //     frame_table[victim_pfn].mapped = 0; //not in use
+    // }
+    // frame_table[victim_pfn].referenced = 0;
+    // /* Return the pfn */
+    // return victim_pfn;
 }
 
 
