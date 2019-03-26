@@ -119,9 +119,6 @@ void proc_init(pcb_t *proc) {
 void context_switch(pcb_t *proc) {
 
     PTBR =  proc -> saved_ptbr;
-    /* PTBR = page table base register. It tells where to look to find the page table for the currently 
-    running process. Now, we are setting PTBR to the curent proc page table. */
-
 }
 
 /*  --------------------------------- PROBLEM 5 --------------------------------------
@@ -160,7 +157,6 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     
     /* Split the address and find the page table entry.
        Remember to keep a pointer to the entry so you can modify it later. */
-
     vpn_t vpn = vaddr_vpn(address);         //getting the vpn of the address.
     uint16_t offset = vaddr_offset(address);    //getting the offset of the address.
     
@@ -173,7 +169,6 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         stats.page_faults++;
         page_fault(address);
     }
-
 
     /*
         The physical address will be constructed like this:
@@ -192,7 +187,7 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
 
 
     pfn_t pfn = pageTable[vpn].pfn;
-    paddr_t physicaladdress = ((paddr_t) pfn << OFFSET_LEN) | offset;
+    paddr_t physicaladdress = ((paddr_t) pfn << OFFSET_LEN) | offset;  //calculating the physical address form offset and pfn
 
     /* Either read or write the data to the physical address
        depending on 'rw' */
@@ -201,9 +196,9 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         stats.reads++;      // increment reading
         return mem[physicaladdress];
     } else {
+        pageEntry->dirty = 1; //the disk needs to get the change of data that we write and so is dirty.
         stats.writes++;     //increment writing
         mem[physicaladdress] = data; 
-        pageEntry->dirty = 1; //the disk needs to get the change of data that we write and so is dirty.
         return data;    /* Return the data read/written */
     }
 
@@ -234,10 +229,12 @@ void proc_cleanup(pcb_t *proc) {
         if (pageEntry->valid) {
             pfn_t pfn = pageEntry->pfn;
             pageEntry->valid = 0;
+            
             fte_t* frame_entry = (fte_t*) (frame_table + pfn);
             frame_entry->mapped = 0;    // not in use (delete the link between page and frame.)
         }
         if (swap_exists(pageEntry)) {   //swap if need be
+            
             swap_free(pageEntry);
         }
     }

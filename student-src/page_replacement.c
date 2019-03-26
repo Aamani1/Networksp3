@@ -104,16 +104,16 @@ pfn_t select_victim_frame() {
     } else if (replacement == FIFO) {
         /* Implement a FIFO algorithm here */
         timestamp_t longest = get_current_timestamp();
-        pfn_t head = 0;
+        pfn_t first = 0;
         for (pfn_t i = 0; i < num_entries; i++) { //iterate over the all the entries
             if (!frame_table[i].protected) {    //if not protected
                 if (frame_table[i].timestamp < longest) {   //if less than longest
-                    head = i;
+                    first = i;
                     longest = frame_table[i].timestamp; //update the time
                 }
             }
         }
-        return head;    
+        return first;    
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
