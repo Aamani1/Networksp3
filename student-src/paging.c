@@ -45,6 +45,7 @@ void system_init(void) {
      * frames in memory. The frame table will be useful later if we need to
      * evict pages during page faults.
      */
+    clock = 1;
     frame_table = (fte_t *)mem;
     memset(frame_table, 0, PAGE_SIZE);
 
