@@ -20,7 +20,7 @@ stats_t stats;
 */
 void compute_stats() {
 
-    double access_time = stats.accesses * MEMORY_READ_TIME + stats.page_faults * DISK_PAGE_READ_TIME + stats.writebacks * DISK_PAGE_WRITE_TIME;
-    stats.aat = access_time / (double) (stats.accesses);
+    double accesstime = stats.accesses * MEMORY_READ_TIME + stats.page_faults * DISK_PAGE_READ_TIME + stats.writebacks * DISK_PAGE_WRITE_TIME;
+    stats.aat = accesstime / (double) (stats.accesses);
 
 }
