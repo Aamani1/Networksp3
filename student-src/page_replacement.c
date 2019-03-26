@@ -56,7 +56,7 @@ pfn_t free_frame(void) {
         pageEntry->valid = 0; //not in the frame anymore
         frame_table[victim_pfn].mapped = 0; //not in use
     }
-
+    frame_table[victim_pfn].referenced = 0;
     /* Return the pfn */
     return victim_pfn;
 }
