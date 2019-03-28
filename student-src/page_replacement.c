@@ -6,7 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-pfn_t clck = 0;
+pfn_t clck;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -116,9 +116,8 @@ pfn_t select_victim_frame() {
         return first;    
 
     } else if (replacement == CLOCKSWEEP) {
-        timestamp_t longest = get_current_timestamp();
-        pfn_t first = 0;//head
-        for (pfn_t i = 0; i < num_entries; i++) { //iterate over the all the entries
+        while(1) {
+            clck = clck % NUM_FRAMES;
             if (!frame_table[i].protected) {    //if not protected
                 if (frame_table[i].timestamp > 0) {   //if less than longest
                     frame_table[i].timestamp = 0;
