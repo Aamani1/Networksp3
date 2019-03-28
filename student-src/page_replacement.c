@@ -116,10 +116,14 @@ pfn_t select_victim_frame() {
         return first;    
 
     } else if (replacement == CLOCKSWEEP) {
+        /* Optionally, implement the clocksweep algorithm here */
         while(1) {
-            clck = clck % num_entries;
+            // clck = clck % num_entries;
+            if(clck>= num_entries){
+                clck = 0;
+            }
             if (!frame_table[clck].protected) {    //if not protected
-                if (frame_table[clck].timestamp > 0 && frame_table[clck].timestamp < 2) {   //if less than longest
+                if (frame_table[clck].timestamp > 0) {   //if less than longest
                     frame_table[clck].timestamp = 0;
                 } else {
                     clck++;
