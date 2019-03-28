@@ -172,6 +172,10 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         page_fault(address);
     }
 
+    if(replacement == CLOCKSWEEP){
+        timestamp = 1;
+    }
+
     /*
         The physical address will be constructed like this:
         -------------------------------------
