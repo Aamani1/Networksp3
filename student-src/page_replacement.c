@@ -6,6 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
+int i_prime = 0;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -116,23 +117,17 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
-        timestamp_t time = get_current_timestamp(); //get the current time stamp
-        pfn_t p = 0; //to save the frame number.. local variable
-
-        for (pfn_t i = 1; i < NUM_FRAMES; i++) { //iterate over the all the frames
- 
-            if (time > frame_table[i].timestamp) { //if there is any less time process
-            
-                if (!frame_table[i].protected) { //with not protected bit save it local variable
-            
-                    p = i;
-                    time = frame_table[i].timestamp; //update the time
+        while(1) {
+          i_prime = i_prime % NUM_FRAMES;
+            if (frame_table[i_prime].protected != 1) {
+                if (frame_table[i_prime].referenced == 1) {
+                    frame_table[i_prime].referenced = 0;
+                } else {
+                    i_prime++;
+                    return i_prime-1;
                 }
             }
-        } 
-
-        if (p > 0) {
-           return p;  //return the frame number.
+            i_prime++;
         }
      
     }
