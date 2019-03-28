@@ -6,7 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-int i_prime = 0;
+int clck = 0;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
@@ -118,16 +118,16 @@ pfn_t select_victim_frame() {
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
         while(1) {
-          i_prime = i_prime % NUM_FRAMES;
-            if (frame_table[i_prime].protected != 1) {
-                if (frame_table[i_prime].referenced == 1) {
-                    frame_table[i_prime].referenced = 0;
+          clck = clck % NUM_FRAMES;
+            if (frame_table[clck].protected != 1) {
+                if (frame_table[clck].referenced == 1) {
+                    frame_table[clck].referenced = 0;
                 } else {
-                    i_prime++;
-                    return i_prime-1;
+                    clck++;
+                    return clck-1;
                 }
             }
-            i_prime++;
+            clck++;
         }
      
     }
