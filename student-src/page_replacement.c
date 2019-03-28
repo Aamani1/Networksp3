@@ -6,7 +6,7 @@
 #include "util.h"
 
 pfn_t select_victim_frame(void);
-pfn_t clck;
+pfn_t clck = 0;
 
 /*  --------------------------------- PROBLEM 7 --------------------------------------
     Checkout PDF section 7 for this problem
