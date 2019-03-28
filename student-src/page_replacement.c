@@ -117,7 +117,7 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         while(1) {
-            clck = clck % NUM_FRAMES;
+            clck = clck % num_entries;
             if (!frame_table[clck].protected) {    //if not protected
                 if (frame_table[clck].timestamp > 0) {   //if less than longest
                     frame_table[clck].timestamp = 0;
