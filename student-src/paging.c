@@ -173,7 +173,7 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     }
 
     if(replacement == CLOCKSWEEP){
-        frame_table[vpn].timestamp = 1;
+        frame_table[(*pageEntry).pfn].timestamp = 1;
     }
 
     /*

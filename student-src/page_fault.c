@@ -79,9 +79,6 @@ void page_fault(vaddr_t address) {
     } else {
         memset(frame_ptr, 0, PAGE_SIZE);    //just zero the pages memory.
     }
-
-
-
 }
 
 #pragma GCC diagnostic pop
