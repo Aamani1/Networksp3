@@ -47,7 +47,6 @@ typedef struct ft_entry {
     /* -- Used for data pages -- */
     uint8_t mapped;             /* 1 if the frame is mapped, 0
                                    otherwise */
-    uint8_t referenced;
     timestamp_t timestamp;      /* 32 bit number that represents the last time 
                                   this frame was mapped. Can update this value by 
                                   calling get_current_timestamp() */

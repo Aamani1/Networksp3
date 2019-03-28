@@ -116,19 +116,32 @@ pfn_t select_victim_frame() {
         return first;    
 
     } else if (replacement == CLOCKSWEEP) {
-        /* Optionally, implement the clocksweep algorithm here */
-        while(1) {
-          clck = clck % NUM_FRAMES;
-            if (frame_table[clck].protected != 1) {
-                if (frame_table[clck].referenced == 1) {
-                    frame_table[clck].referenced = 0;
+        timestamp_t longest = get_current_timestamp();
+        pfn_t first = 0;//head
+        for (pfn_t i = 0; i < num_entries; i++) { //iterate over the all the entries
+            if (!frame_table[i].protected) {    //if not protected
+                if (frame_table[i].timestamp > 0) {   //if less than longest
+                    frame_table[i].timestamp = 0;
                 } else {
                     clck++;
-                    return clck-1;
+                    return clck - 1;
                 }
             }
             clck++;
         }
+        /* Optionally, implement the clocksweep algorithm here */
+        // while(1) {
+        //   clck = clck % NUM_FRAMES;
+        //     if (frame_table[clck].protected != 1) {
+        //         if (frame_table[clck].referenced == 1) {
+        //             frame_table[clck].referenced = 0;
+        //         } else {
+        //             clck++;
+        //             return clck-1;
+        //         }
+        //     }
+        //     clck++;
+        // }
      
     }
 
