@@ -119,6 +119,8 @@ void proc_init(pcb_t *proc) {
 void context_switch(pcb_t *proc) {
 
     PTBR =  proc -> saved_ptbr;
+    /* PTBR = page table base register. It tells where to look to find the page table for the currently 
+                                    running process. Now, we are setting PTBR to the curent proc page table. */
 }
 
 /*  --------------------------------- PROBLEM 5 --------------------------------------
@@ -157,11 +159,11 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
     
     /* Split the address and find the page table entry.
        Remember to keep a pointer to the entry so you can modify it later. */
-    vpn_t vpn = vaddr_vpn(address);         //getting the vpn of the address.
+    vpn_t vpn = vaddr_vpn(address);         //getting the vpn(virtual page number) of the address.
     uint16_t offset = vaddr_offset(address);    //getting the offset of the address.
     
     pte_t* pageTable = (pte_t*) (mem + (PTBR * PAGE_SIZE));    //getting the page table of the current process.
-    pte_t* pageEntry = (pte_t*) (pageTable + vpn);    //getting the pfn from vpn through page table stored in frame
+    pte_t* pageEntry = (pte_t*) (pageTable + vpn);    //getting the pfn(page frame number) from vpn through page table stored in frame
                                                         // finding the frame associated with the pfn from the page
 
     /* If an entry is invalid, just page fault to allocate a page for the page table. */

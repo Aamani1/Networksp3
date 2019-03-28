@@ -103,7 +103,7 @@ pfn_t select_victim_frame() {
     } else if (replacement == FIFO) {
         /* Implement a FIFO algorithm here */
         timestamp_t longest = get_current_timestamp();
-        pfn_t first = 0;
+        pfn_t first = 0;//head
         for (pfn_t i = 0; i < num_entries; i++) { //iterate over the all the entries
             if (!frame_table[i].protected) {    //if not protected
                 if (frame_table[i].timestamp < longest) {   //if less than longest
@@ -116,6 +116,24 @@ pfn_t select_victim_frame() {
 
     } else if (replacement == CLOCKSWEEP) {
         /* Optionally, implement the clocksweep algorithm here */
+        timestamp_t time = get_current_timestamp(); //get the current time stamp
+        pfn_t p = 0; //to save the frame number.. local variable
+
+        for (pfn_t i = 1; i < NUM_FRAMES; i++) { //iterate over the all the frames
+ 
+            if (time > frame_table[i].timestamp) { //if there is any less time process
+            
+                if (!frame_table[i].protected) { //with not protected bit save it local variable
+            
+                    p = i;
+                    time = frame_table[i].timestamp; //update the time
+                }
+            }
+        } 
+
+        if (p > 0) {
+           return p;  //return the frame number.
+        }
      
     }
 
