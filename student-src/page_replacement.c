@@ -119,7 +119,7 @@ pfn_t select_victim_frame() {
         while(1) {
             clck = clck % num_entries;
             if (!frame_table[clck].protected) {    //if not protected
-                if (frame_table[clck].timestamp > 0) {   //if less than longest
+                if (frame_table[clck].timestamp > 0 && frame_table[clck].timestamp < 2) {   //if less than longest
                     frame_table[clck].timestamp = 0;
                 } else {
                     clck++;
