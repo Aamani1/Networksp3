@@ -119,7 +119,7 @@ pfn_t select_victim_frame() {
         /* Optionally, implement the clocksweep algorithm here */
         while(1) {
             // clck = clck % num_entries;
-            if(clck>= num_entries){
+            if(clck >= num_entries){
                 clck = 0;
             }
             if (!frame_table[clck].protected) {    //if not protected

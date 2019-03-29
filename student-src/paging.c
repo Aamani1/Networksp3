@@ -172,6 +172,7 @@ uint8_t mem_access(vaddr_t address, char rw, uint8_t data) {
         page_fault(address);
     }
 
+    //for clocksweep
     if(replacement == CLOCKSWEEP){
         frame_table[(*pageEntry).pfn].timestamp = 1;
     }
