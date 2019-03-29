@@ -132,19 +132,6 @@ pfn_t select_victim_frame() {
             }
             clck++;
         }
-        /* Optionally, implement the clocksweep algorithm here */
-        // while(1) {
-        //   clck = clck % NUM_FRAMES;
-        //     if (frame_table[clck].protected != 1) {
-        //         if (frame_table[clck].referenced == 1) {
-        //             frame_table[clck].referenced = 0;
-        //         } else {
-        //             clck++;
-        //             return clck-1;
-        //         }
-        //     }
-        //     clck++;
-        // }
      
     }
 
